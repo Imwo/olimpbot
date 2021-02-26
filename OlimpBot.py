@@ -38,7 +38,6 @@ def reg_surname(message):
 
 def reg_level(message):
     global level
-    #age = message.text
     while level == 0:
         try:
             level = int(message.text)
@@ -56,59 +55,106 @@ def reg_level(message):
                      reply_markup=keyboard)
 
 
-@bot.callback_query_handler(func=lambda call: True)
-def callback_worker(call):
+@bot.callback_query_handler(lambda query: query.data in ["yes", "no"])
+def callback_worker(query):
     try:
-        if call.data == "yes":
-            markup = types.InlineKeyboardMarkup(row_width=2)
-            itembtn1 = types.InlineKeyboardButton(
-                text='математика', callback_data='mathematics')
-            itembtn2 = types.InlineKeyboardButton(
-                text='физика', callback_data='physics')
-            itembtn3 = types.InlineKeyboardButton(
-                text='информатика', callback_data='informatics')
-            markup.add(itembtn1, itembtn2, itembtn3)
-            bot.send_message(call.message.chat.id,
-                             "Выбери напрвление: ", reply_markup=markup)
-        elif call.data == "no":
-            bot.send_message(call.message.chat.id, "Попробуем еще раз!")
-            bot.send_message(call.message.chat.id,
+        if query.data == "yes":
+            bot.send_message(
+                query.message.chat.id, "Приятно познакомиться! Для продолжения нажми '/continue')")
+        elif query.data == "no":
+            bot.send_message(query.message.chat.id, "Попробуем еще раз!")
+            bot.send_message(query.message.chat.id,
                              "Привет! Давай познакомимся! Как тебя зовут?")
-            bot.register_next_step_handler(call.message, reg_name)
+            bot.register_next_step_handler(query.message, reg_name)
     except Exception as e:
         print(repr(e))
 
 
+@bot.message_handler(commands=['continue'])
+def inline_key(a):
+    mainmenu = types.InlineKeyboardMarkup()
+    key1 = types.InlineKeyboardButton(text='Физика', callback_data='key1')
+    key2 = types.InlineKeyboardButton(text='Информатика', callback_data='key2')
+    key8 = types.InlineKeyboardButton(text='Математика', callback_data='key8')
+    mainmenu.add(key1, key2, key8)
+    bot.send_message(a.chat.id, 'Выбери направление', reply_markup=mainmenu)
+
+
+@bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
-    try:
-        if call.data == 'mathematics':
-            bot.send_message(call.message.chat.id, 'Выбери класс:')
-        elif call.data == 'physics':
-            bot.send_message(call.message.chat.id, 'Выбери направление:')
-        else:
-            bot.send_message(call.message.chat.id, 'Выбери уровень:')
-    except Exception as e:
-        print(repr(e))
+    if call.data == "mainmenu":
+        mainmenu = types.InlineKeyboardMarkup()
+        key1 = types.InlineKeyboardButton(text='Физика', callback_data='key1')
+        key2 = types.InlineKeyboardButton(
+            text='Информатика', callback_data='key2')
+        key8 = types.InlineKeyboardButton(
+            text='Математика', callback_data='key8')
+        mainmenu.add(key1, key2, key8)
+        bot.edit_message_reply_markup(
+            call.message.chat.id, call.message.message_id, reply_markup=mainmenu)
+    elif call.data == "key1":
+        next_menu = types.InlineKeyboardMarkup()
+        key3 = types.InlineKeyboardButton(text='1', callback_data='key3')
+        key5 = types.InlineKeyboardButton(text='2', callback_data='key5')
+        key6 = types.InlineKeyboardButton(text='3', callback_data='key6')
+        back = types.InlineKeyboardButton(
+            text='Назад', callback_data='mainmenu')
+        next_menu.add(key3, key5, key6, back)
+        bot.edit_message_text('Выбери уровень:', call.message.chat.id, call.message.message_id,
+                              reply_markup=next_menu)
+    elif call.data == "key2":
+        next_menu2 = types.InlineKeyboardMarkup()
+        key4 = types.InlineKeyboardButton(text='1', callback_data='key11')
+        key10 = types.InlineKeyboardButton(text='2', callback_data='key10')
+        key7 = types.InlineKeyboardButton(text='3', callback_data='key7')
+        back = types.InlineKeyboardButton(
+            text='Назад', callback_data='mainmenu')
+        next_menu2.add(key4, key10, key7, back)
+        bot.edit_message_text('Выбери уровень:', call.message.chat.id, call.message.message_id,
+                              reply_markup=next_menu2)
+    elif call.data == "key8":
+        next_menu2 = types.InlineKeyboardMarkup()
+        key9 = types.InlineKeyboardButton(text='1', callback_data='key9')
+        key13 = types.InlineKeyboardButton(text='2', callback_data='key13')
+        key12 = types.InlineKeyboardButton(text='3', callback_data='key12')
+        back = types.InlineKeyboardButton(
+            text='Назад', callback_data='mainmenu')
+        next_menu2.add(key9, key13, key12, back)
+        bot.edit_message_text('Выбери уровень:', call.message.chat.id, call.message.message_id,
+                              reply_markup=next_menu2)
 
 
 @bot.message_handler(commands=['noreg'])
-def send_noregistration(message):
-    keyboard = types.InlineKeyboardMarkup()
-    key_mathematics = types.InlineKeyboardButton(
-        text='Физика', callback_data='mathematics')
-    keyboard.add(key_mathematics)
-    key_physics = types.InlineKeyboardButton(
-        text='Математика', callback_data='physics')
-    keyboard.add(key_physics)
-    key_informatics = types.InlineKeyboardButton(
-        text='Информатика', callback_data='informatics')
-    keyboard.add(key_informatics)
-    bot.send_message(message.from_user.id,
-                     "Давай заполним критерии, по которым ты будешь выбирать олимпиады. Выбери направление:", reply_markup=keyboard)
+def send_noreg(message):
+    bot.reply_to(message, "В каком ты классе? ")
 
 
-def send_answer(message):
-    bot.send_message(message.chat.id, "Отлично! Теперь выбери направление")
+@bot.message_handler(content_types=['text'])
+def get_text_messages(message):
+    if message.text == "5":
+        bot.send_message(message.from_user.id,
+                         "Принял, нажми '/continue', чтобы продолжить")
+    elif message.text == "6":
+        bot.send_message(message.from_user.id,
+                         "Принял, нажми '/continue', чтобы продолжить")
+    elif message.text == "7":
+        bot.send_message(message.from_user.id,
+                         "Принял, нажми '/continue', чтобы продолжить")
+    elif message.text == "8":
+        bot.send_message(message.from_user.id,
+                         "Принял, нажми '/continue', чтобы продолжить")
+    elif message.text == "9":
+        bot.send_message(message.from_user.id,
+                         "Принял, нажми '/continue', чтобы продолжить")
+    elif message.text == "10":
+        bot.send_message(message.from_user.id,
+                         "Принял, нажми '/continue', чтобы продолжить")
+    elif message.text == "11":
+        bot.send_message(message.from_user.id,
+                         "Принял, нажми '/continue', чтобы продолжить")
+    else:
+        bot.send_message(message.from_user.id,
+                         "Я тебя не понимаю. Напиши /help.")
 
 
 @bot.message_handler(func=lambda message: True)
@@ -116,4 +162,4 @@ def echo_all(message):
     bot.reply_to(message, " Извини, я не понял твою команду(")
 
 
-bot.polling()
+bot.polling(none_stop=True, interval=0)
