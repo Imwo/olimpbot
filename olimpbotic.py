@@ -145,30 +145,10 @@ def send_noreg(message):
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
-    if message.text == "5":
-        bot.send_message(message.from_user.id,
-                         "Принял, нажми '/continue', чтобы продолжить") # для продолжения возвращаемся к команде 'continue'
-    elif message.text == "6":
-        bot.send_message(message.from_user.id,
-                         "Принял, нажми '/continue', чтобы продолжить")
-    elif message.text == "7":
-        bot.send_message(message.from_user.id,
-                         "Принял, нажми '/continue', чтобы продолжить")
-    elif message.text == "8":
-        bot.send_message(message.from_user.id,
-                         "Принял, нажми '/continue', чтобы продолжить")
-    elif message.text == "9":
-        bot.send_message(message.from_user.id,
-                         "Принял, нажми '/continue', чтобы продолжить")
-    elif message.text == "10":
-        bot.send_message(message.from_user.id,
-                         "Принял, нажми '/continue', чтобы продолжить")
-    elif message.text == "11":
-        bot.send_message(message.from_user.id,
-                         "Принял, нажми '/continue', чтобы продолжить")
+    if message.text in ['6', '7', '8', '9', '10', '11']:
+        bot.send_message(message.from_user.id,"Принял, нажми '/continue', чтобы продолжить") # для продолжения возвращаемся к команде 'continue'
     else:
-        bot.send_message(message.from_user.id,
-                         "Я тебя не понимаю. Напиши /help.")
+        bot.send_message(message.from_user.id,"Я тебя не понимаю. Напиши /help.")
 
 
 @bot.message_handler(func=lambda message: True) # в случае введения команды, которую бот не может распознать
