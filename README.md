@@ -1,2 +1,2 @@
-# olimpbot
+# olimpbotik
 Не совсем рабочий😅
